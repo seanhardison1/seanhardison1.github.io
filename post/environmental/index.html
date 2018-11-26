@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="no-referrer">
+  
+
+  <link rel="icon" type="image/png" href="../../favicon.png">
+
+  <title>
+    
+    
+     Environmental 
+    
+  </title>
+  <link rel="canonical" href="../../post/environmental/">
+
+  <link rel="stylesheet" href="../../css/fonts.css" />
+  <link rel="stylesheet" href="../../css/style.css" />
+
+  
+</head>
+
+<body>
+<section id=nav>
+  <h1><a href="../../">State of the Ecosystem 2018-2019</a></h1>
+  <ul>
+    
+    <li><a href="https://seanhardison1.github.io">Home</a></li>
+    
+    <li><a href="https://github.com/noaa-edab">GitHub</a></li>
+    
+  </ul>
+</section>
+
+
+<section id=content>
+  <h1> Environmental </h1>
+
+  <div id=sub-header>
+    Ecosystems Dynamics and Assessment · 2018/11/26 · 16 minute read
+  </div>
+
+  <div class="entry-content">
+    
+<script src="../../rmarkdown-libs/kePrint/kePrint.js"></script>
+
+<div id="TOC">
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#data-sets">Data sets</a><ul>
+<li><a href="#surface-winds">Surface winds</a></li>
+<li><a href="#slopewater-proportions">Slopewater proportions</a></li>
+<li><a href="#ocean-temperature-anomaly-in-situ">Ocean temperature anomaly (in situ)</a></li>
+<li><a href="#ocean-temperature-oi">Ocean temperature (OI)</a></li>
+<li><a href="#ocean-salinity-anomaly-in-situ">Ocean salinity anomaly (in situ)</a></li>
+<li><a href="#ocean-salinity-oi">Ocean salinity (OI)</a></li>
+<li><a href="#stratification">Stratification</a></li>
+<li><a href="#ecomon-nutrient-data">EcoMon nutrient data</a></li>
+<li><a href="#north-atlantic-oscillation-nao">North Atlantic Oscillation (NAO)</a></li>
+</ul></li>
+<li><a href="#synthesis">Synthesis</a><ul>
+<li><a href="#visualize-series-build-correlation-matrices">Visualize Series &amp; Build Correlation Matrices</a></li>
+</ul></li>
+</ul>
+</div>
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>The purpose of this report is to document State of the Ecosystem (SOE) indicator data processing. All R code used to process and visualize the following data sets is self-contained in the <a href="https://github.com/NOAA-EDAB/soe/blob/master/inst/Rmd/process_raw.Rmd">Rmarkdown document</a> associated with this HTML file. To run and update data sets in this document, set the <code>save_clean</code> parameter in the set-up chunk to <code>TRUE</code>. Raw data for these indicators are available in the file directory <code>soe/inst/extdata</code>.</p>
+<style type="text/css">
+pre code, pre, code {
+  white-space: pre !important;
+  overflow-y: scroll !important;
+  word-break: keep-all !important;
+  word-wrap: initial !important;
+  max-height: 400px;
+}
+</style>
+</div>
+<div id="data-sets" class="section level2">
+<h2>Data sets</h2>
+<div id="surface-winds" class="section level3 tabset tabset-fade">
+<h3>Surface winds</h3>
+<p>These data are sourced from the <a href="https://www.esrl.noaa.gov/psd/data/gridded/data.narr.monolevel.html">NCEP North American Regional Reanalysis (NARR)</a>, extending from January 1979 to September 2018.</p>
+<table class="table table-striped" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+<span id="tab:unnamed-chunk-3">Table 1: </span>Variables in “NCEP NARR surface wind; TKE; HLCY, monthly, 1979-2018, V1.csv”
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+Variable
+</th>
+<th style="text-align:left;">
+Name
+</th>
+<th style="text-align:left;">
+Units
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Wind speed
+</td>
+<td style="text-align:left;">
+uwnd
+</td>
+<td style="text-align:left;width: 5cm; ">
+m sec<sup>-1</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Wind direction
+</td>
+<td style="text-align:left;">
+vwnd
+</td>
+<td style="text-align:left;width: 5cm; ">
+°
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Turbulent kinetic energy
+</td>
+<td style="text-align:left;">
+tke
+</td>
+<td style="text-align:left;width: 5cm; ">
+J kg<sup>-1</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Storm relative helicity
+</td>
+<td style="text-align:left;">
+hlcy
+</td>
+<td style="text-align:left;width: 5cm; ">
+m<sup>2</sup>sec<sup>-2</sup>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Variables included in these data are surface wind speed and direction (<em>uwnd</em> and <em>vwnd</em> respectively), surface turbulent kinetic energy (TKE), and storm relative helicity (HLCY). An indicator for total wind speed is calculated below as
+<span class="math display">\[\textrm{TWS} = \sqrt{u^2 + v^2}\]</span>. Data are visualized seasonally (Fall = October, November, December; Winter = January, February, March; Spring = April, May, June; Summer = July, August, September).</p>
+<p><strong>Filename</strong>: NCEP NARR surface wind; TKE; HLCY, monthly, 1979-2018, V1.csv<br />
+<strong>Contributor</strong>: Vincent Saba, (<a href="mailto:vincent.saba@noaa.gov" class="email">vincent.saba@noaa.gov</a>)</p>
+<div id="processing" class="section level4">
+<h4>Processing</h4>
+<pre class="r"><code># Read in raw data
+d &lt;- read.csv(file.path(raw.dir,&quot;NCEP NARR surface wind; TKE; HLCY, monthly, 1979-2018, V1.csv&quot;))
+
+# Processing steps for all wind speed data
+wind_clean1 &lt;- d  %&gt;% gather(., Var, Value, GB.uwnd:MAB.tke) %&gt;% #convert wide to long
+  dplyr::rename(Time = Month.Year) %&gt;% #rename time variable
+  separate(Var, c(&quot;EPU&quot;,&quot;Var&quot;),&quot;\\.&quot;) %&gt;% #separate out EPU from variable names
+    mutate(Time = dmy(.$Time), #Convert to date format
+         Units = plyr::mapvalues(Var, from = unique(Var), to = c(rep(&quot;J/kg&quot;,2),&quot;m^2/sec^2&quot;,&quot;J/kg&quot;)), #add units
+         Time, season = plyr::mapvalues(month(Time), from = seq(1,12,1), #Get season
+                                         to = c(rep(&quot;winter&quot;,3),
+                                                rep(&quot;spring&quot;,3),
+                                                rep(&quot;summer&quot;,3),
+                                                rep(&quot;fall&quot;,3)))) 
+
+
+# Calculate total wind speed from u and v components
+total_wind_speed &lt;- wind_clean1 %&gt;% 
+  filter(Var == &quot;uwnd&quot;| Var == &quot;vwnd&quot;) %&gt;% #select variables
+  spread(., Var, Value) %&gt;% #convert to wide for calculating tws
+  mutate(`total wind speed` = sqrt(uwnd^2 + vwnd^2)) %&gt;%  #tws
+  dplyr::select(-uwnd, -vwnd) %&gt;% #start processing back to SOE format
+  gather(.,Var, Value, `total wind speed`) #convert to long
+
+wind_clean &lt;- rbind(wind_clean1, total_wind_speed)
+wind_clean &lt;- wind_clean %&gt;%
+  unite(., Var, c(Var, season), sep = &quot; &quot;) %&gt;% #merge season into Var column
+  group_by(Time = year(Time), EPU, Var, Units) %&gt;% 
+  dplyr::summarise(Value = mean(Value)) %&gt;% 
+  as.data.frame()
+
+if (save_clean){
+save(wind_clean, file =
+       file.path(clean.dir, &quot;wind_clean.Rdata&quot;))
+}</code></pre>
+</div>
+<div id="mab-total-wind-speed" class="section level4">
+<h4>MAB Total Wind Speed</h4>
+<p><img src="../../post/2018-11-26-environmental_files/figure-html/wind_speed_vis-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="gb-total-wind-speed" class="section level4">
+<h4>GB Total Wind Speed</h4>
+<p><img src="../../post/2018-11-26-environmental_files/figure-html/GB%20tws-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="gom-total-wind-speed" class="section level4">
+<h4>GOM Total Wind Speed</h4>
+<p><img src="../../post/2018-11-26-environmental_files/figure-html/GOM%20tws-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="mab-helicity" class="section level4">
+<h4>MAB Helicity</h4>
+<p><img src="../../post/2018-11-26-environmental_files/figure-html/MAB%20hel-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="gb-helicity" class="section level4">
+<h4>GB Helicity</h4>
+<p><img src="../../post/2018-11-26-environmental_files/figure-html/GB%20hel-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="gom-helicity" class="section level4">
+<h4>GOM Helicity</h4>
+<p><img src="../../post/2018-11-26-environmental_files/figure-html/GOM%20hel-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="mab-tke" class="section level4">
+<h4>MAB TKE</h4>
+<p><img src="../../post/2018-11-26-environmental_files/figure-html/MAB%20tke-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="gb-tke" class="section level4">
+<h4>GB TKE</h4>
+<p><img src="../../post/2018-11-26-environmental_files/figure-html/GB%20tke-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="gom-tke" class="section level4">
+<h4>GOM TKE</h4>
+<p><img src="../../post/2018-11-26-environmental_files/figure-html/GOM%20tke-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="slopewater-proportions" class="section level3 tabset tabset-fade">
+<h3>Slopewater proportions</h3>
+<p>Slopewater proportions give the percent total of water type observed in the deep Northeast Channel (150-200 m depth).</p>
+<table class="table table-striped" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+<span id="tab:unnamed-chunk-4">Table 2: </span>Variables in “slopewater_proportions.csv”
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+Variable
+</th>
+<th style="text-align:left;">
+Names
+</th>
+<th style="text-align:left;">
+Units
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Warm Slope Water proportion
+</td>
+<td style="text-align:left;width: 5cm; ">
+WSW
+</td>
+<td style="text-align:left;">
+unitless
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Labrador Shelf Slope Water proportion
+</td>
+<td style="text-align:left;width: 5cm; ">
+LSLW
+</td>
+<td style="text-align:left;">
+unitless
+</td>
+</tr>
+</tbody>
+</table>
+<p>Raw data fields correspond to year, water mass flavor (WSW = Warm Slope Water, LSLW = Labrador Slope Water), and proportion of total expressed as a percentage.</p>
+<p><strong>Filename</strong>: slopewater_proportions.csv<br />
+<strong>Contributor</strong>: Paula Fratantoni (<a href="mailto:paula.fratantoni@noaa.gov" class="email">paula.fratantoni@noaa.gov</a>)</p>
+<div id="processing-1" class="section level4">
+<h4>Processing</h4>
+<pre class="r"><code>d &lt;- read.csv(file.path(raw.dir,&quot;slopewater_proportions.csv&quot;))
+
+slopewater &lt;- d %&gt;%
+  dplyr::rename(Time = year, Var = water.mass.flavor, Value = prop) %&gt;% 
+  mutate(EPU = &quot;GOM&quot;, Units = &quot;unitless&quot;, Var2 = &quot;proportion ne channel&quot;) %&gt;% 
+  unite(.,Var,c(Var,Var2), sep = &quot; &quot;)
+
+if (save_clean){
+save(slopewater, file =
+       file.path(clean.dir, &quot;slopewater_proportions.Rdata&quot;))
+}</code></pre>
+</div>
+<div id="visualization" class="section level4">
+<h4>Visualization</h4>
+<pre class="r"><code>slopewater %&gt;% 
+  mutate(Var, Var = plyr::mapvalues(Var, from = c(&quot;WSW proportion ne channel&quot;,
+                                                  &quot;LSLW proportion ne channel&quot;),
+                                    to = c(&quot;WSW&quot;,&quot;LSLW&quot;))) %&gt;% 
+  dplyr::rename(Flavor  = Var) %&gt;% 
+ggplot() +
+  geom_line(aes(x = Time, y = Value, color = Flavor))+
+  geom_point(aes(x = Time, y = Value, color = Flavor)) +
+  ylab(&quot;Percent of Total Slopewater&quot;) +
+  ggtitle(&quot;Slopewater Proportions in NE Channel&quot;)+
+  theme_bw()+
+  theme(strip.background = element_blank())</code></pre>
+<p><img src="../../post/2018-11-26-environmental_files/figure-html/slopewater_vis-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="ocean-temperature-anomaly-in-situ" class="section level3 tabset tabset-fade">
+<h3>Ocean temperature anomaly (in situ)</h3>
+<p>These data include <em>in situ</em> regional time series of both surface and bottom water temperature anomalies on the Northeast Continental Shelf. Raw data is split into four files by EPU (SS, GOM, GB, and MAB).</p>
+<table class="table table-striped" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+<span id="tab:unnamed-chunk-5">Table 3: </span>Variables in “Eco{EPU}_core_Ttopbot.csv”
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+Variable
+</th>
+<th style="text-align:left;">
+Names
+</th>
+<th style="text-align:left;">
+Units
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+SST anomaly
+</td>
+<td style="text-align:left;">
+Tsfc_anom
+</td>
+<td style="text-align:left;width: 5cm; ">
+°C
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Reference SST (1981-2010)
+</td>
+<td style="text-align:left;">
+Tsfc_ref
+</td>
+<td style="text-align:left;width: 5cm; ">
+°C
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Bottom temp. anomaly
+</td>
+<td style="text-align:left;">
+Tbot_anom
+</td>
+<td style="text-align:left;width: 5cm; ">
+°C
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Reference BT (1981-2010)
+</td>
+<td style="text-align:left;">
+Tbot_ref
+</td>
+<td style="text-align:left;width: 5cm; ">
+°C
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Filenames</strong>: EcoSS_core_Ttopbot.csv, EcoGoM_core_Ttopbot.csv, EcoGB_core_Ttopbot.csv, EcoMAB_core_Ttopbot.csv<br />
+<strong>Contributor</strong>: Paula Fratantoni (<a href="mailto:paula.fratantoni@noaa.gov" class="email">paula.fratantoni@noaa.gov</a>)</p>
+<div id="processing-2" class="section level4">
+<h4>Processing</h4>
+<pre class="r"><code>ss &lt;- read.csv(file.path(raw.dir,&quot;EcoSS_core_Ttopbot.csv&quot;)) %&gt;% mutate(EPU = &quot;SS&quot;)
+gom &lt;- read.csv(file.path(raw.dir,&quot;EcoGoM_core_Ttopbot.csv&quot;)) %&gt;% mutate(EPU = &quot;GOM&quot;)
+gb &lt;- read.csv(file.path(raw.dir,&quot;EcoGB_core_Ttopbot.csv&quot;)) %&gt;% mutate(EPU = &quot;GB&quot;)
+mab &lt;- read.csv(file.path(raw.dir,&quot;EcoMAB_core_Ttopbot.csv&quot;)) %&gt;% mutate(EPU = &quot;MAB&quot;)
+
+ocean_temp_insitu &lt;- rbind(ss, gom, gb, mab) %&gt;% #bind all
+  dplyr::rename(Time = decimal.year, Var = variable.name, Value = temperature) %&gt;% #rename
+  mutate(Units = &quot;degreesC&quot;, Time = as.Date(format(date_decimal(Time), &quot;%Y-%b-%d&quot;), &quot;%Y-%b-%d&quot;),
+         Var, Var = plyr::mapvalues(Var, from = c(&quot;Tsfc_anom&quot;,#Rename variables
+                             &quot;Tsfc_ref&quot;,
+                             &quot;Tbot_anom&quot;,
+                             &quot;Tbot_ref&quot;),
+                             to = c(&quot;sst anomaly in situ&quot;,
+                                &quot;reference sst in situ (1981-2010)&quot;,
+                                &quot;bottom temp anomaly in situ&quot;,
+                                &quot;reference bt in situ (1981-2010)&quot;))) %&gt;% 
+  group_by(Time = year(Time), EPU, Var, Units) %&gt;%
+  dplyr::summarise(Value = mean(Value)) %&gt;%
+  as.data.frame() 
+
+if (save_clean){
+save(ocean_temp_insitu, file =
+       file.path(clean.dir, &quot;ocean_temp_insitu.Rdata&quot;))
+}</code></pre>
+</div>
+<div id="visualization-1" class="section level4">
+<h4>Visualization</h4>
+<p><img src="../../post/2018-11-26-environmental_files/figure-html/ocean_temp_vis-1.png" width="960" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="ocean-temperature-oi" class="section level3 tabset">
+<h3>Ocean temperature (OI)</h3>
+<p>These data show NE shelf surface and bottom temperatures estimated through an optimal interpolation procedure (see methods <a href="https://noaa-edab.github.io/ECSA">here</a>). Spring and fall time series were standardized to April 3 and October 11 between the period of 1968-2017. The code below first creates a downsampled raster of each Ecological Production Unit. These downsampled EPU rasters are then used to mask SST and bottom temperature data, from which annual means are computed. This same approach is used to generate time series from EcoMon zooplankton sampling and optimally interpolated salinity data.</p>
+<p><strong>Filename</strong>: temp_bottom_fall_spdf.Rdata, temp_bottom_spring_spdf.Rdata, temp_surface_fall_spdf.Rdata, temp_surface_spring_spdf.Rdata<br />
+<strong>Contributor</strong>: Kevin Friedland (<a href="mailto:kevin.friedland@noaa.gov" class="email">kevin.friedland@noaa.gov</a>)</p>
+<div id="processing-3" class="section level4">
+<h4>Processing</h4>
+<p><em>Raster manipulation &amp; variable selection functions</em></p>
+<pre class="r"><code>#Read in EPU shapefile (will be downsampled to match raster resolution)
+epu &lt;- readOGR(file.path(gis.dir, &quot;EPU_Extended.shp&quot;), verbose = F) 
+
+#Write function to build EPU rasters
+build_raster &lt;- function(EPU){
+  
+  #Filter raster by EPU
+  epu &lt;- epu[epu$EPU == EPU,]
+  
+  #Build empty raster
+  r1 &lt;- raster::raster()
+  e &lt;- raster::extent(-75.950, -65.450, 35.650, 44.650)
+  raster::extent(r1) &lt;- e
+  
+  #fill with EPU polygon
+  r1 &lt;- raster::rasterize(epu, r1, field = 1, fun = mean)
+  raster::crs(r1) &lt;- NA
+  
+  #create raster to resample with
+  r2 &lt;- raster::raster(nrow = 90, ncol = 105)
+  raster::extent(r2) &lt;- e
+  raster::crs(r2) &lt;- NA
+  
+  #Downsample high res EPU raster to match data
+  r.new &lt;- raster::resample(r1, r2, method=&quot;bilinear&quot;)
+  r.new[is.finite(r.new)] &lt;- 1 
+  
+  return(r.new)
+  
+}
+
+#Raster data
+mab_rast &lt;- build_raster(&quot;MAB&quot;)
+gb_rast &lt;- build_raster(&quot;GB&quot;)
+gom_rast &lt;- build_raster(&quot;GOM&quot;)
+
+#Process ECSA data by EPU and create time series
+
+epu_env &lt;- function(variable, type = NULL, season, genus = NULL, epu){
+  
+
+  if(!is.null(type) &amp; !variable %in% c(&quot;salinity&quot;,&quot;temperature&quot;)){
+    stop(&#39;type only applicable for variables &quot;salinity&quot; and &quot;temperature&quot;
+         as type = &quot;bottom&quot; or type = &quot;surface&quot;&#39;)
+  } 
+  
+  if(!is.null(genus) &amp; variable != &quot;zooplankton&quot;){
+    stop(&#39;genus only applicable for variable &quot;zooplankton&quot;&#39;)
+  } 
+  
+  #get compiled down-sampled raster of chosen strata from shapefile. 
+  epumask.raster &lt;- get(paste0(tolower(epu),&quot;_rast&quot;))
+  
+  #get bottom temp data and find mean for stock area--------------------------------------
+  
+  indir &lt;- here(&quot;static&quot;,&quot;inst&quot;,&quot;extdata&quot;,&quot;gridded&quot;)
+  
+  if (variable == &quot;salinity&quot;){
+    load(file.path(indir, paste0(&quot;sal_&quot;,type,&quot;_&quot;,season,&quot;_spdf.rdata&quot;)))
+  } else if (variable == &quot;temperature&quot;){
+    load(file.path(indir, paste0(&quot;temp_&quot;,type,&quot;_&quot;,season,&quot;_spdf.rdata&quot;)))
+  } else if (variable == &quot;chlorophyll&quot;){
+    load(file.path(indir, paste0(&quot;chl_&quot;,season,&quot;_1997-2018.rdata&quot;)))
+  } else if (variable == &quot;zooplankton&quot;){
+    load(file.path(indir, paste0(genus,&quot;_&quot;,season,&quot;_zoo_1977-2016.rdata&quot;)))
+  }
+  
+
+    #create null df to fill with results
+    data = data.frame(array(NA,dim= c(raster::nlayers(ecsa_dat),5)))
+    
+    #loops through layers in raster brick
+    for(i in 1:raster::nlayers(ecsa_dat)){
+      #load raster by year
+      
+      #get file information from title
+      layer_id &lt;- stringr::str_extract(names(ecsa_dat)[[i]], &quot;\\d.*&quot;)
+      layer_id &lt;- stringr::str_split(layer_id, &quot;_&quot;)
+      data[i,1] &lt;- layer_id[[1]][[1]]
+      data[i,2] &lt;- layer_id[[1]][[2]]
+      data[i,3] &lt;- layer_id[[1]][[3]]
+      
+      #trim to stock area
+      masked.raster = ecsa_dat[[i]]*epumask.raster
+      
+      #find mean BT of stock area
+      data[i,4] = raster::cellStats(masked.raster, stat=&#39;mean&#39;, na.rm=TRUE)
+      data[i,5] = raster::cellStats(masked.raster, stat = &#39;sd&#39;, na.rm=TRUE)
+      # 
+      # if (layer_id[[1]][[1]] == &quot;1995&quot;){
+      #   break
+      # }
+    }
+    x &lt;- as.numeric(data$X1)
+    y.out &lt;- data$X4
+    y.sd &lt;- data$X5
+    
+    sd.low &lt;- y.out - y.sd
+    sd.high &lt;- y.out + y.sd
+    
+  # remove 
+  if (variable == &quot;zooplankton&quot;){
+    if (season == &quot;spring&quot;){
+      y.out[x %in% c(1989, 1990, 1991, 1994)] &lt;- NA
+      sd.low[x %in% c(1989, 1990, 1991, 1994)] &lt;- NA
+      sd.high[x %in% c(1989, 1990, 1991, 1994)] &lt;- NA
+    } else if (season == &quot;fall&quot;) {
+      y.out[x %in% c(1989, 1990, 1992)] &lt;- NA
+      sd.low[x %in% c(1989, 1990, 1992)] &lt;- NA
+      sd.high[x %in% c(1989, 1990, 1992)] &lt;- NA
+    }
+  }
+  
+  if(variable == &quot;chlorophyll&quot;){
+    type &lt;- &quot;&quot;
+  } else if (variable == &quot;zooplankton&quot;){
+    type &lt;- genus
+    variable &lt;- &quot;zoo&quot;
+  } 
+  
+  out &lt;- data.frame(Var = paste(paste(type,variable),season),
+                    Time = as.numeric(x),
+                    Value = y.out,
+                    sd.low = sd.low,
+                    sd.high = sd.high,
+                    Season = season,
+                    epu = epu)
+  
+  out &lt;- out[out$Time &gt; 1968,]
+  return(out)
+  
+}</code></pre>
+<p><em>Data pull &amp; aggregation</em></p>
+<pre class="r"><code>#Bottom temperatures
+bt_fall_mab &lt;- epu_env(variable = &quot;temperature&quot;, type = &quot;bottom&quot;, season = &quot;fall&quot;, epu = &quot;MAB&quot;)
+bt_spring_mab &lt;- epu_env(variable = &quot;temperature&quot;, type = &quot;bottom&quot;, season = &quot;spring&quot;, epu = &quot;MAB&quot;)
+
+bt_fall_gb &lt;- epu_env(variable = &quot;temperature&quot;, type = &quot;bottom&quot;, season = &quot;fall&quot;, epu = &quot;GB&quot;)
+bt_spring_gb &lt;- epu_env(variable = &quot;temperature&quot;, type = &quot;bottom&quot;, season = &quot;spring&quot;, epu = &quot;GB&quot;)
+
+bt_fall_gom &lt;- epu_env(variable = &quot;temperature&quot;, type = &quot;bottom&quot;, season = &quot;fall&quot;, epu = &quot;GOM&quot;)
+bt_spring_gom &lt;- epu_env(variable = &quot;temperature&quot;, type = &quot;bottom&quot;, season = &quot;spring&quot;, epu = &quot;GOM&quot;)
+
+
+#Surface temperatures
+sst_fall_mab &lt;- epu_env(variable = &quot;temperature&quot;, type = &quot;surface&quot;, season = &quot;fall&quot;, epu = &quot;MAB&quot;)
+sst_spring_mab &lt;- epu_env(variable = &quot;temperature&quot;, type = &quot;surface&quot;, season = &quot;spring&quot;, epu = &quot;MAB&quot;)
+
+sst_fall_gb &lt;- epu_env(variable = &quot;temperature&quot;, type = &quot;surface&quot;, season = &quot;fall&quot;, epu = &quot;GB&quot;)
+sst_spring_gb &lt;- epu_env(variable = &quot;temperature&quot;, type = &quot;surface&quot;, season = &quot;spring&quot;, epu = &quot;GB&quot;)
+
+sst_fall_gom &lt;- epu_env(variable = &quot;temperature&quot;, type = &quot;surface&quot;, season = &quot;fall&quot;, epu = &quot;GOM&quot;)
+sst_spring_gom &lt;- epu_env(variable = &quot;temperature&quot;, type = &quot;surface&quot;, season = &quot;spring&quot;, epu = &quot;GOM&quot;)
+
+
+bottom_temp_oi &lt;- rbind(bt_fall_mab,
+                       bt_spring_mab,
+                       bt_fall_gb,
+                       bt_spring_gb,
+                       bt_fall_gom,
+                       bt_spring_gom)
+
+surface_temp_oi &lt;- rbind(sst_fall_mab,
+                       sst_spring_mab,
+                       sst_fall_gb,
+                       sst_spring_gb,
+                       sst_fall_gom,
+                       sst_spring_gom)
+
+#Start with annual mean, generating sampling uncertainty for this time series is possible
+bottom_temp_oi_annual &lt;- bottom_temp_oi %&gt;% 
+  group_by(epu, Time) %&gt;% 
+  dplyr::summarise(Value = mean(Value)) %&gt;% 
+  dplyr::rename(EPU = epu) %&gt;% 
+  dplyr::mutate(Units = &quot;degreesC&quot;, Var = &quot;bottom temp OI&quot;) 
+  
+
+#Same thing for annual SST
+surface_temp_oi_annual &lt;- surface_temp_oi %&gt;% 
+  group_by(epu, Time) %&gt;% 
+  dplyr::summarise(Value = mean(Value)) %&gt;% 
+  dplyr::rename(EPU = epu) %&gt;% 
+  dplyr::mutate(Units = &quot;degreesC&quot;, Var = &quot;surface temp OI&quot;)
+
+ocean_temp_oi &lt;- rbind(bottom_temp_oi_annual, surface_temp_oi_annual)
+
+if (save_clean){
+  save(ocean_temp_oi,file =
+       file.path(clean.dir, &quot;ocean_temp_oi.Rdata&quot;))
+}</code></pre>
+</div>
+<div id="visualization-2" class="section level4">
+<h4>Visualization</h4>
+<p><img src="../../post/2018-11-26-environmental_files/figure-html/ocean_temp_oi_vis-1.png" width="960" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="ocean-salinity-anomaly-in-situ" class="section level3 tabset tabset-fade">
+<h3>Ocean salinity anomaly (in situ)</h3>
+<p>These data include <em>in situ</em> regional time series of both surface and bottom salinity anomalies on the Northeast Continental Shelf. Raw data is split into four files by EPU (SS, GOM, GB, and MAB).</p>
+<table class="table table-striped" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+<span id="tab:unnamed-chunk-6">Table 4: </span>Variables in “Eco{EPU}_core_Stopbot.csv”
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+Variable
+</th>
+<th style="text-align:left;">
+Names
+</th>
+<th style="text-align:left;">
+Units
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Surface salinity anomaly
+</td>
+<td style="text-align:left;width: 5cm; ">
+Ssfc_anom
+</td>
+<td style="text-align:left;">
+PSU
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Reference surface salinity (1981-2010)
+</td>
+<td style="text-align:left;width: 5cm; ">
+Ssfc_ref
+</td>
+<td style="text-align:left;">
+PSU
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Bottom salinity anomaly
+</td>
+<td style="text-align:left;width: 5cm; ">
+Sbot_anom
+</td>
+<td style="text-align:left;">
+PSU
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Reference bottom salinity (1981-2010)
+</td>
+<td style="text-align:left;width: 5cm; ">
+Sbot_ref
+</td>
+<td style="text-align:left;">
+PSU
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Filenames</strong>: EcoSS_core_Stopbot.csv, EcoGoM_core_Stopbot.csv, EcoGB_core_Stopbot.csv, EcoMAB_core_Stopbot.csv<br />
+<strong>Contributor</strong>: Paula Fratantoni (<a href="mailto:paula.fratantoni@noaa.gov" class="email">paula.fratantoni@noaa.gov</a>)</p>
+<div id="processing-4" class="section level4">
+<h4>Processing</h4>
+<pre class="r"><code>ss &lt;- read.csv(file.path(raw.dir,&quot;EcoSS_core_Stopbot.csv&quot;)) %&gt;% mutate(EPU = &quot;SS&quot;)
+gom &lt;- read.csv(file.path(raw.dir,&quot;EcoGoM_core_Stopbot.csv&quot;)) %&gt;% mutate(EPU = &quot;GOM&quot;)
+gb &lt;- read.csv(file.path(raw.dir,&quot;EcoGB_core_Stopbot.csv&quot;)) %&gt;% mutate(EPU = &quot;GB&quot;)
+mab &lt;- read.csv(file.path(raw.dir,&quot;EcoMAB_core_Stopbot.csv&quot;)) %&gt;% mutate(EPU = &quot;MAB&quot;)
+
+ocean_sal_insitu &lt;- rbind(ss, gom, gb, mab) %&gt;% #bind all
+  dplyr::rename(Time = decimal.year, Var = variable.name, Value = salinity) %&gt;% #rename
+  mutate(Units = &quot;PSU&quot;, Time = as.Date(format(date_decimal(Time), &quot;%Y-%b-%d&quot;), &quot;%Y-%b-%d&quot;),
+         Var, Var = plyr::mapvalues(Var, from = c(&quot;Ssfc_anom&quot;,
+                             &quot;Ssfc_ref&quot;,
+                             &quot;Sbot_anom&quot;,
+                             &quot;Sbot_ref&quot;),
+                     to = c(&quot;surface salinity anomaly in situ&quot;,
+                        &quot;reference surface salinity in situ (1981-2010)&quot;,
+                        &quot;bottom salinity anomaly in situ&quot;,
+                        &quot;reference bottom salinity in situ (1981-2010)&quot;))) %&gt;% 
+  group_by(Time = year(Time), EPU, Var, Units) %&gt;%
+  dplyr::summarise(Value = mean(Value)) %&gt;%
+  as.data.frame()
+
+if (save_clean){
+save(ocean_sal_insitu, file =
+       file.path(clean.dir, &quot;ocean_sal_insitu.Rdata&quot;))
+}</code></pre>
+</div>
+<div id="visualization-3" class="section level4">
+<h4>Visualization</h4>
+<p><img src="../../post/2018-11-26-environmental_files/figure-html/salinity_vis-1.png" width="960" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="ocean-salinity-oi" class="section level3 tabset tabset-fade">
+<h3>Ocean salinity (OI)</h3>
+<p>These data show optimally interpolated sea-surface and bottom salinities between 1992-2017 (methods for OI procedure are available <a href="https://noaa-edab.github.io/ECSA/">here</a>. Processing of these time series follows the same methods used to process optimally interpolated ocean temperatures. These data are presented as RasterStacks (i.e. one raster layer per year), which are then masked by EPU polygons for further analyses. Here we take the annual mean of masked raster layers to create a time series of OI observations.</p>
+<p><strong>Filename</strong>: sal_bottom_fall_spdf.Rdata, sal_bottom_spring_spdf.Rdata, sal_surface_fall_spdf.Rdata, sal_surface_spring_spdf.Rdata<br />
+<strong>Contributor</strong>: Kevin Friedland (<a href="mailto:kevin.friedland@noaa.gov" class="email">kevin.friedland@noaa.gov</a>)</p>
+<div id="processing-5" class="section level4">
+<h4>Processing</h4>
+<pre class="r"><code>#Bottom salinities
+bsal_fall_mab &lt;- epu_env(variable = &quot;salinity&quot;, type = &quot;bottom&quot;, season = &quot;fall&quot;, epu = &quot;MAB&quot;)
+bsal_spring_mab &lt;- epu_env(variable = &quot;salinity&quot;, type = &quot;bottom&quot;, season = &quot;spring&quot;, epu = &quot;MAB&quot;)
+
+bsal_fall_gb &lt;- epu_env(variable = &quot;salinity&quot;, type = &quot;bottom&quot;, season = &quot;fall&quot;, epu = &quot;GB&quot;)
+bsal_spring_gb &lt;- epu_env(variable = &quot;salinity&quot;, type = &quot;bottom&quot;, season = &quot;spring&quot;, epu = &quot;GB&quot;)
+
+bsal_fall_gom &lt;- epu_env(variable = &quot;salinity&quot;, type = &quot;bottom&quot;, season = &quot;fall&quot;, epu = &quot;GOM&quot;)
+bsal_spring_gom &lt;- epu_env(variable = &quot;salinity&quot;, type = &quot;bottom&quot;, season = &quot;spring&quot;, epu = &quot;GOM&quot;)
+
+
+#Surface salinities
+ssal_fall_mab &lt;- epu_env(variable = &quot;salinity&quot;, type = &quot;surface&quot;, season = &quot;fall&quot;, epu = &quot;MAB&quot;)
+ssal_spring_mab &lt;- epu_env(variable = &quot;salinity&quot;, type = &quot;surface&quot;, season = &quot;spring&quot;, epu = &quot;MAB&quot;)
+
+ssal_fall_gb &lt;- epu_env(variable = &quot;salinity&quot;, type = &quot;surface&quot;, season = &quot;fall&quot;, epu = &quot;GB&quot;)
+ssal_spring_gb &lt;- epu_env(variable = &quot;salinity&quot;, type = &quot;surface&quot;, season = &quot;spring&quot;, epu = &quot;GB&quot;)
+
+ssal_fall_gom &lt;- epu_env(variable = &quot;salinity&quot;, type = &quot;surface&quot;, season = &quot;fall&quot;, epu = &quot;GOM&quot;)
+ssal_spring_gom &lt;- epu_env(variable = &quot;salinity&quot;, type = &quot;surface&quot;, season = &quot;spring&quot;, epu = &quot;GOM&quot;)
+
+
+bottom_sal_oi &lt;- rbind(bsal_fall_mab,
+                       bsal_spring_mab,
+                       bsal_fall_gb,
+                       bsal_spring_gb,
+                       bsal_fall_gom,
+                       bsal_spring_gom)
+
+surface_sal_oi &lt;- rbind(ssal_fall_mab,
+                       ssal_spring_mab,
+                       ssal_fall_gb,
+                       ssal_spring_gb,
+                       ssal_fall_gom,
+                       ssal_spring_gom)
+
+#Start with annual mean, generating sampling uncertainty for this time series is possible
+bottom_sal_oi_annual &lt;- bottom_sal_oi %&gt;% 
+  group_by(epu, Time) %&gt;% 
+  dplyr::summarise(Value = mean(Value)) %&gt;% 
+  dplyr::rename(EPU = epu) %&gt;% 
+  dplyr::mutate(Units = &quot;PSU&quot;, Var = &quot;bottom sal OI&quot;) 
+  
+
+#Same thing for annual salinity
+surface_sal_oi_annual &lt;- surface_sal_oi %&gt;% 
+  group_by(epu, Time) %&gt;% 
+  dplyr::summarise(Value = mean(Value)) %&gt;% 
+  dplyr::rename(EPU = epu) %&gt;% 
+  dplyr::mutate(Units = &quot;PSU&quot;, Var = &quot;surface sal OI&quot;)
+
+ocean_sal_oi &lt;- rbind(bottom_sal_oi_annual, surface_sal_oi_annual)
+
+if (save_clean){
+  save(ocean_sal_oi,file =
+       file.path(clean.dir, &quot;ocean_sal_oi.Rdata&quot;))
+}</code></pre>
+</div>
+<div id="visualization-4" class="section level4">
+<h4>Visualization</h4>
+<p><img src="../../post/2018-11-26-environmental_files/figure-html/ocean_sal_oi_vis-1.png" width="960" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="stratification" class="section level3 tabset tabset-fade">
+<h3>Stratification</h3>
+<p>These data are time series of average stratification (0-50 m depth) by EPU.</p>
+<p><strong>Filename</strong>: Strat50.csv<br />
+<strong>Contributor</strong>: Paula Fratantoni (<a href="mailto:paula.fratantoni@noaa.gov" class="email">paula.fratantoni@noaa.gov</a>)</p>
+<table class="table table-striped" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+<span id="tab:unnamed-chunk-7">Table 5: </span>Variables in “Strat50.csv”
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+Variable
+</th>
+<th style="text-align:left;">
+Names
+</th>
+<th style="text-align:left;">
+Units
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+stratification
+</td>
+<td style="text-align:left;width: 5cm; ">
+stratification
+</td>
+<td style="text-align:left;">
+kg m <sup>-3</sup>
+</td>
+</tr>
+</tbody>
+</table>
+<div id="processing-6" class="section level4">
+<h4>Processing</h4>
+<pre class="r"><code>strat &lt;- read.csv(file.path(raw.dir, &quot;Strat50.csv&quot;), stringsAsFactors = FALSE)
+
+stratification &lt;- strat %&gt;% 
+  dplyr::rename(Time = time, Var = var, Value = stratification) %&gt;% 
+  separate(., Var, c(&quot;Var&quot;,&quot;EPU&quot;), sep = &quot;_&quot;) %&gt;% 
+  mutate(Var = &quot;stratification (0-50 m)&quot;,
+         Units = &quot;kg m^-3&quot;)
+
+if (save_clean){
+  save(stratification, file = file.path(clean.dir, &quot;stratification.Rdata&quot;))
+}</code></pre>
+</div>
+<div id="visualization-5" class="section level4">
+<h4>Visualization</h4>
+<p><img src="../../post/2018-11-26-environmental_files/figure-html/strat_vis-1.png" width="960" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="ecomon-nutrient-data" class="section level3 tabset">
+<h3>EcoMon nutrient data</h3>
+These data include nutrient concentrations, temperature, salinity, density, and dissolved oxygen data sampled via CTD profiles on Ecosystem Monitoring (EcoMon) cruises between 11/3/2009 - 10/19/2016. More metadata are available <a href="https://www.nodc.noaa.gov/oads/data/0127524.xml">here</a>.<br />
+</br>
+<div align="center">
+<div style="border: 1px solid #ddd; padding: 5px; overflow-y: scroll; height:400px; ">
+<table class="table table-striped" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+<span id="tab:unnamed-chunk-8">Table 6: </span>Variables in “EcoMon Nutrient Data Through June 2018.csv”
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+Variable
+</th>
+<th style="text-align:left;">
+Names
+</th>
+<th style="text-align:left;">
+Units
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Cruise identifier
+</td>
+<td style="text-align:left;width: 5cm; ">
+EXPOCODE
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cruise identifier
+</td>
+<td style="text-align:left;width: 5cm; ">
+Cruise_ID
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Station number
+</td>
+<td style="text-align:left;width: 5cm; ">
+STNNBR
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+CTD cast number
+</td>
+<td style="text-align:left;width: 5cm; ">
+CASTNO
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sample bottle number
+</td>
+<td style="text-align:left;width: 5cm; ">
+BTLNBR
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sample date
+</td>
+<td style="text-align:left;width: 5cm; ">
+Date_UTC
+</td>
+<td style="text-align:left;">
+MM/DD/YYYY
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sample time
+</td>
+<td style="text-align:left;width: 5cm; ">
+Time_UTC
+</td>
+<td style="text-align:left;">
+hh:mm
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Latitude
+</td>
+<td style="text-align:left;width: 5cm; ">
+Latitude
+</td>
+<td style="text-align:left;">
+decimal degrees
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Longitude
+</td>
+<td style="text-align:left;width: 5cm; ">
+Longitude
+</td>
+<td style="text-align:left;">
+decimal degrees
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Depth of station
+</td>
+<td style="text-align:left;width: 5cm; ">
+Depth_station
+</td>
+<td style="text-align:left;">
+m
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Depth of sample
+</td>
+<td style="text-align:left;width: 5cm; ">
+Depth_sampling
+</td>
+<td style="text-align:left;">
+m
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Water pressure
+</td>
+<td style="text-align:left;width: 5cm; ">
+CTDPRS
+</td>
+<td style="text-align:left;">
+decibars
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Water temperature
+</td>
+<td style="text-align:left;width: 5cm; ">
+CTDTEMP
+</td>
+<td style="text-align:left;">
+°C
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Water salinity
+</td>
+<td style="text-align:left;width: 5cm; ">
+CTDSAL
+</td>
+<td style="text-align:left;">
+PSS-78
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Potential density at surface pressure
+</td>
+<td style="text-align:left;width: 5cm; ">
+Sigma.Theta
+</td>
+<td style="text-align:left;">
+kg m<sup>-3</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Dissolved oxygen
+</td>
+<td style="text-align:left;width: 5cm; ">
+CTDOXY
+</td>
+<td style="text-align:left;">
+mg L<sup>-1</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Silicic acid concentration
+</td>
+<td style="text-align:left;width: 5cm; ">
+SILCAT
+</td>
+<td style="text-align:left;">
+<span class="math inline">\(\mu\)</span>M
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Total nitrate and nitrite concentration
+</td>
+<td style="text-align:left;width: 5cm; ">
+NITRIT+NITRAT
+</td>
+<td style="text-align:left;">
+<span class="math inline">\(\mu\)</span>M
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ammonia concentration
+</td>
+<td style="text-align:left;width: 5cm; ">
+AMMMONIA
+</td>
+<td style="text-align:left;">
+<span class="math inline">\(\mu\)</span>M
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Phosphate concentration
+</td>
+<td style="text-align:left;width: 5cm; ">
+PHSPHT
+</td>
+<td style="text-align:left;">
+<span class="math inline">\(\mu\)</span>M
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Dissolved oxygen
+</td>
+<td style="text-align:left;width: 5cm; ">
+CTDOXYMOL
+</td>
+<td style="text-align:left;">
+<span class="math inline">\(\mu\)</span>mol kg<sup>-1</sup>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p></br>
+<strong>Filename</strong>: EcoMon Nutrient Data Through June 2018.csv<br />
+<strong>Contributor</strong>: Chris Melrose (<a href="mailto:chris.melrose@noaa.gov" class="email">chris.melrose@noaa.gov</a>)</p>
+<div id="processing-7" class="section level4">
+<h4>Processing</h4>
+<pre class="r"><code>d &lt;- read.csv(file.path(raw.dir,&quot;EcoMon Nutrient Data Through June 2018.csv&quot;), stringsAsFactors = FALSE)
+
+#Create data frame for mapping units to variable names
+mapping &lt;- data.frame(Units = as.character(d[1,]),
+                      Var = as.character(names(d)))
+mapping[mapping$Units == &quot;&quot; | mapping$Units == &quot;NA&quot;,]$Units &lt;- NA
+
+#remove row with units
+d &lt;- slice(d,-1)
+
+d1 &lt;- d %&gt;% 
+  mutate(Time = Date_UTC) %&gt;% #create Time variable
+  dplyr::select(-Date_UTC,-Time_UTC) %&gt;% #remove time, date
+  gather(., Var, Value, -Latitude, -Longitude, -Time, -Depth_sampling, -Depth_station) %&gt;% #turn wide to long while retaining lat/lon
+  filter(!is.na(Value)) %&gt;% #remove NA
+  left_join(., mapping, by = c(&quot;Var&quot;)) %&gt;% #join units 
+  mutate(Longitude = as.numeric(Longitude),
+         Latitude = as.numeric(Latitude),
+         Time = mdy(Time)) %&gt;% 
+  filter(Latitude &gt; 32, Latitude&lt;50)
+
+
+#Sanity check
+# t1 &lt;- d1[d1$Var == &quot;CTDOXYMOL&quot; ,]$Value
+# t &lt;-  d %&gt;% slice(.,-1)
+# t &lt;- as.character(t$CTDOXYMOL)
+# all(t == t1)
+
+#Read in EPU shapefile
+epu &lt;- readOGR(file.path(gis.dir, &quot;EPU_Extended.shp&quot;), verbose = F) 
+epu &lt;- as(epu, &quot;sf&quot;) #convert to sf object
+
+if(spatial_processing){
+
+  #Test maps
+  #All EPUs
+  #ggplot() + geom_sf(data = epu)
+  
+  #Scotian shelf
+  # ss &lt;- epu %&gt;% filter(EPU == &quot;SS&quot;)
+  # ggplot() + geom_sf(data = ss)
+  
+  #get latitude and longitude for creating SpatialPointsDataFrame
+  lat &lt;-  as.numeric(d$Latitude)
+  lon &lt;- as.numeric(d$Longitude)
+  coords &lt;- data.frame(lon = lon,lat = lat)
+  
+  #create spdf
+  spdf &lt;- SpatialPointsDataFrame(coords = coords, data = coords,
+                                 proj4string = CRS(crs))
+  #convert to sf
+  coords_sf &lt;- st_as_sf(spdf) 
+  
+  #get intersection for mapping EPUs back to nutrient data
+  epu_intersect &lt;- st_intersection(epu, coords_sf)
+  #plot(epu_intersect[epu_intersect$EPU == &quot;MAB&quot;,])
+  
+  #Map back to nutrient data frame
+  epu_df &lt;- data.frame(Longitude = epu_intersect$lon,
+                       Latitude = epu_intersect$lat,
+                       EPU = epu_intersect$EPU)
+  #join
+  NE_LME_nutrients &lt;- d1 %&gt;% 
+    left_join(.,epu_df, by = c(&quot;Latitude&quot;,&quot;Longitude&quot;))
+  
+  #Select data for plotting 
+  Nitr &lt;- NE_LME_nutrients %&gt;% filter(Var == &quot;NITRIT.NITRAT&quot;)
+  
+  #Back to SOE format and specify bottom, mid-water, or surface sampling
+  NE_LME_nutrients &lt;- NE_LME_nutrients %&gt;%
+    dplyr::select(-Latitude, -Longitude) %&gt;% 
+    mutate(Value = as.numeric(Value),
+           Depth_station = as.numeric(Depth_station),
+           Depth_sampling = as.numeric(Depth_sampling)) %&gt;% 
+    mutate(bot_dif = Depth_station-Depth_sampling) %&gt;% 
+    mutate(surf_bot = ifelse(bot_dif &lt;= 10, &quot;bottom&quot;,
+                           ifelse(bot_dif &gt; 10 &amp; Depth_sampling &lt;= 5, &quot;surface&quot;, &quot;mid-water&quot;))) %&gt;% 
+    filter(Value &gt; 0, !is.na(EPU), !Var %in% c(&quot;BTLNBR&quot;,&quot;CASTNO&quot;,&quot;Depth_sampling&quot;,
+                                             &quot;Depth_station&quot;,&quot;STNNBR&quot;)) %&gt;% 
+    mutate(Var = paste(Var, surf_bot)) %&gt;% 
+    dplyr::select(Time, Var, Value, Units, EPU) %&gt;% 
+    group_by(EPU, Time = year(Time), Var, Units) %&gt;% 
+    dplyr::summarise(Value = mean(Value, na.rm = TRUE)) %&gt;% 
+    as.data.frame()
+  
+  if (save_clean){
+    save(NE_LME_nutrients,file = file.path(clean.dir, &quot;EcoMon_nutrients.Rdata&quot;))
+  }
+} else {
+  load(file.path(sample.dir,&quot;sample_nutrients.Rdata&quot;))
+  load(file.path(clean.dir,&quot;EcoMon_nutrients.Rdata&quot;))
+}</code></pre>
+</div>
+<div id="qa" class="section level4">
+<h4>QA</h4>
+<p><img src="../../post/2018-11-26-environmental_files/figure-html/ecomon_plotting1-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="surface-nutrients" class="section level4">
+<h4>Surface Nutrients</h4>
+<p><img src="../../post/2018-11-26-environmental_files/figure-html/surface_nutrients-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="bottom-nutrients" class="section level4">
+<h4>Bottom Nutrients</h4>
+<p><img src="../../post/2018-11-26-environmental_files/figure-html/bottom_nutrients-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="north-atlantic-oscillation-nao" class="section level3 tabset">
+<h3>North Atlantic Oscillation (NAO)</h3>
+<p>North Atlantic Oscillation data were taken from the <a href="http://www.cpc.ncep.noaa.gov/data/teledoc/nao.shtml">NOAA NWS Climate Prediction Center</a>. These data show the monthly NAO index time series beginning in 1950 and ending in October 2018. The index is standardized to the 1981-2010 reference period. More information regarding the methodology involved in deriving the NAO and its significance is available <a href="http://www.cpc.ncep.noaa.gov/data/teledoc/nao.shtml">here</a>.</p>
+<div id="processing-8" class="section level4">
+<h4>Processing</h4>
+<pre class="r"><code>d &lt;- read.csv(file.path(raw.dir, &quot;NAO_index_1950-Oct2018.csv&quot;)) %&gt;% slice(.,-826:-825)
+
+#Three month running average
+nao_cpc &lt;- d %&gt;% 
+  mutate(Time = paste0(YEAR,&quot;:Q&quot;,rep(1:4, each = 3))) %&gt;% 
+  group_by(Time) %&gt;% 
+  dplyr::summarise(Value = mean(INDEX)) %&gt;% 
+  mutate(Var = &quot;nao index&quot;, units = &quot;unitless&quot;, EPU = &quot;all&quot;,
+         Time = yq(Time))
+
+#annual average
+nao_annual &lt;- d %&gt;% 
+  group_by(YEAR) %&gt;% 
+  dplyr::summarise(Value = mean(INDEX),
+                   Variance = var(INDEX)) %&gt;% 
+  mutate(Var = &quot;nao index&quot;, Units = &quot;unitless&quot;, EPU = &quot;all&quot;) %&gt;% 
+  dplyr::rename(Time = YEAR)
+
+if (save_clean){
+  nao &lt;- nao_annual %&gt;% select(-Variance) 
+  save(nao, file = file.path(clean.dir, &quot;nao_annual.Rdata&quot;))
+}</code></pre>
+</div>
+<div id="nao-index-and-index-variance-annual" class="section level4">
+<h4>NAO index and index variance (Annual)</h4>
+<p><img src="../../post/2018-11-26-environmental_files/figure-html/NAO_index-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+</div>
+<div id="synthesis" class="section level2">
+<h2>Synthesis</h2>
+<div id="visualize-series-build-correlation-matrices" class="section level3 tabset">
+<h3>Visualize Series &amp; Build Correlation Matrices</h3>
+<div id="visualization-app" class="section level4">
+<h4>Visualization App</h4>
+<iframe src="https://seanhardison.shinyapps.io/soe-shiny/?showcase=0" width="672" height="500px">
+</iframe>
+</div>
+<div id="methods" class="section level4">
+<h4>Methods</h4>
+<p>The purpose of this application is for users to familiarize themselves with available indicator data sets. Biases introduced by small sample sizes are not considered in the correlation matrices, and so these visualizations should only be considered an exploratory analysis.</p>
+<p>To create correlation matrices, we first developed a function (shown below) to normalize and assess each time series for stationarity using the Augmented Dickey Fuller (ADF) test. If a time series were found to be non-stationary, we applied a first-order differencing step before assessing for stationarity again. If upon the second ADF test the series was still shown to be non-stationarity, it was not included in further correlation analyses rather than applying higher order differencing. This step was taken to prevent over-differencing of series. Group structure in correlation matrices was defined by the magnitude of the scaled and centered first principal component.</p>
+<pre class="r"><code>#Normalization and differencing function
+
+get_dat &lt;- function(field){
+  #Split out data
+  time &lt;- env[env$Var == field,]$Time
+  end &lt;- max(time)
+  time &lt;- time[1:which(time == end)]
+  Value &lt;- env[env$Var == field,]$Value
+  
+  if (all(is.na(as.numeric(Value))) | sd(Value, na.rm = T) == 0){
+    Value &lt;- NA #Assign as NA if not including
+  } else {
+    
+    Value &lt;- Value[1:length(time)]
+    Value &lt;- (Value-mean(Value, na.rm = TRUE))/sd(Value, na.rm = TRUE) #normalize
+    
+    #interpolate missing values
+    if (any(is.na(Value))){
+      Value &lt;- approx(time, Value, n = length(Value))$y
+    }
+    
+    #test for stationarity with Augmented Dickey Fuller
+    adf &lt;- suppressWarnings(adf.test(Value)$p.value)
+    
+    if (adf &gt; 0.05){ #if non-stationary take first difference and use residuals
+      mod &lt;- arima(Value, order = c(0,1,0))
+      Value &lt;- resid(mod)
+      
+      adf2 &lt;- suppressWarnings(adf.test(Value)$p.value) #check again for stationarity
+      if (adf2 &gt; 0.05){
+        Value &lt;- NA #if still non-stationary, make NA for exclusion
+      }
+      
+    }
+    
+  }
+  out &lt;- data.frame(var = field,
+                    value = as.numeric(Value),
+                    time = time)
+  return(out)
+}</code></pre>
+</div>
+</div>
+</div>
+
+  </div>
+
+  <div id=links>
+    
+      <a class="basic-alignment left" href="../../post/lower-trophic-levels/">&laquo; Lower Trophic Levels</a>
+    
+    
+  </div>
+</section>
+
+<section id="comments">
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+
+(function() {
+      
+      
+      if (window.location.hostname == "localhost")
+                return;
+
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      var disqus_shortname = '';
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</section>
+
+
+  
+  
+<script src="../../js/math-code.js"></script>
+<script async src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+
+
+</body>
+</html>
+
